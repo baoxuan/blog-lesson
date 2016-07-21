@@ -10,7 +10,6 @@ express mogoodb
 
 -e 指定使用ejs模板引擎
 
-<<<<<<< HEAD
 **app.js**：启动文件，或者说入口文件
 
 **package.json**：存储着工程的信息及模块依赖，当在 dependencies 中添加依赖的模块时，运行 npm install，npm 会检查当前目录下的 package.json，并自动安装所有指定的模块
