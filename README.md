@@ -29,8 +29,6 @@ express mogoodb
 *routes*：存放路由文件
 *views*：存放视图文件或者说模版文件
 *bin*：存放可执行文件
->>>>>>> acad8ce9c48f08eb12fd629653eb4dcad98cc089
-
 **bin**：存放可执行文件
 
 
