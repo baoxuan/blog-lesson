@@ -32,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // 加载解析cookie 的中间价
 app.use(cookieParser());
 // 设置public文件夹为存放静态文件的目录。
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
@@ -43,7 +44,6 @@ app.use(session({
   })
 
 }));
-
 
 
 

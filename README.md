@@ -62,7 +62,7 @@ b.ejs
 
 		this is b.ejs
 最终 index.ejs 会显示：
-			
+
 			this is a.ejs
 			hello,world!
 			this is b.ejs
@@ -79,6 +79,31 @@ b.ejs
 `supervisor bin/www`
 
 
+#### session 和 MongoDB
 
+session 和 cookie区别和联系
+
+session存储在服务器端，cookie存储在客户端。session依赖于cookie。
+
+cookie机制采用在客户端保持状态的方案，它是用户端的会话状态的存储机制
+session机制采用的是一种在客户端与服务器之间保持状态的解决方案
+
+由于采用服务器端保持状态的方案在客户端也需要保存一个标识，所以session机制可能需要借助于cookie机制来达到保存标识的目的。而session提供了方便管理全局变量的方式
+
+**express-session 和connect-mongo**
+
+- secret: 用来防止篡改cookie,
+- key: 为cookie的名字
+- cookie: 用来指定保存session数据的cookie设置的对象
+- store: 用来保存session数据的第三方存储数据
+
+**express-session 原理**
+session保存在sessionStore的数据仓库中。默认使用MemoryStore。也就是说所有的session信息都保存在内存中。
+
+每来一个请求后，在路由分发前，首先使用cookieParser中间件将cookie中的sessionID解析出来，然后根据sessionID去sessionStore中进行查找，如果找到一份session后，就使用sessionStore中的数据构建一个新的session对象，把这个session对象放到req.session中
+
+**flash**
+
+flash 是一个在session中用于存储信息的特定区域。信息写入flash,下一次显示完毕即被清除。配合重定向使用
 
 
