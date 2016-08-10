@@ -31,6 +31,7 @@ Comment.prototype.save = function(callback){
 				"time.day":day,
 				"title":title
 			},{
+				// $push 会向已有的数组末尾加入一个元素,要是没有就会创建一个数组
 				$push:{"comments":comment}
 			},function(err){
 				mongodb.close();

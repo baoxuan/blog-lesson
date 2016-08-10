@@ -17,12 +17,18 @@ var upload = multer({storage: storage});
 module.exports =  function(app){
 
 	app.get('/',function(req,res){
-		Post.getAll(null,function(err,posts){
+		//判断是否为第一页 并把请求页数转换成number类型
+		var page = parseInt(req.query.p) || 1;
+		// 查询并返回第page 页的10篇文章
+		Post.getTen(null, page, function(err,posts,total){
 			if(err){
 				posts =[];
 			}
 			res.render('index',{
 				title:'主页',
+				page:page,
+				isFirstPage:(page -1) == 0,
+				isLastPage:((page-1)*10 +posts.length) == total,
 				user:req.session.user,
 				posts:posts,
 				success:req.flash('success').toString(),
@@ -127,7 +133,8 @@ module.exports =  function(app){
 
 	app.post('/post', function(req,res){
 		var currentUser =  req.session.user,
-			post = new Post(currentUser.name,req.body.title,req.body.post);
+			tags = [req.body.tag1, req.body.tag2, req.body.tag3],
+			post = new Post(currentUser.name, req.body.title, tag3, req.body.post);
 		post.save(function(err){
 			if(err){
 				req.flash('error',err);
@@ -162,13 +169,14 @@ module.exports =  function(app){
 	});
 
 	app.get('/u/:name',function(req,res){
+		var page = parseInt(req.params.p) || 1;
 		//检查用户是否存在
 		User.get(req.params.name,function(err,user){
 			if(!user){
 				req.flash('error','用户不存在！');
 				return res.redirect('/');
 			}
-			Post.getAll(user.name,function(err,posts){
+			Post.getTen(user.name, page, function(err, posts, total){
 				if(err){
 					req.flash('error',err);
 					return res.redirect('/');
@@ -176,6 +184,9 @@ module.exports =  function(app){
 				res.render('user',{
 					title:user.name,
 					posts:posts,
+					page:page,
+					isFirstPage:(page-1) == 0,
+					isLastPage:((page-1)*10 +posts.length) == total,
 					user:req.session.user,
 					success:req.flash('success').toString(),
 					error:req.flash('error').toString()
@@ -261,7 +272,37 @@ module.exports =  function(app){
 			req.flash('success','留言成功！');
 			res.redirect('back');
 		})
-	})
+	});
+	app.get('/archive',function(req,res){
+		Post.getArchive(function (err,posts) {
+			if(err){
+				req.flash("error",err);
+				return res.redirect('/');
+			}
+			res.render('archive',{
+				title:'存档',
+				posts:posts,
+				user:req.session.user,
+				success:req.flash('success').toString(),
+				error:req.flash('error').toString()
+			});
+		});
+	});
+	app.get('/tags',function (req,res) {
+		Post.getTags(function (err,posts) {
+			if(err){
+				req.flash("error",err);
+				return res.redirect('/');
+			}
+			res.render('tags',{
+				title:'标签',
+				posts:posts,
+				user:req.session.user,
+				success:req.flash("success").toString(),
+				error:req.flash('error').toString()
+			});
+		});
+	});
 
 
 	function checkLogin(req,res,next){
