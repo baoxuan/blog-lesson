@@ -12,6 +12,10 @@ var flash = require('connect-flash');
 var session = require('express-session');
 var MongoStroe = require('connect-mongo')(session);
 
+var fs =  require('fs');
+var accessLog =  fs.createWriteStream('access.log',{flags:'a'});
+var errorLog =  fs.createWriteStream('error.log',{flags:'a'});
+
 var app = express();
 
 // view engine setup
@@ -24,7 +28,8 @@ app.use(flash());
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 // 加载日志中间件
-app.use(logger('dev'));
+app.use(logger('dev',{stream:accessLog}));
+// app.use(logger({stream:accessLog}));
 // 加载解析json 中间件
 app.use(bodyParser.json());
 // 加载解析urlencoded 请求体中间件
@@ -35,13 +40,21 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function (err, req, res, next) {
+  var meta = '[' + new Date() + ']' + req.url + '/n';
+  errorLog.write(meta + err.stack + '/n');
+  next();
+})
+
 app.use(session({
   secret:setting.cookieSecret,
-  key:setting.db,//cookie name
+  key:setting.db,
   cookie:{maxAge:1000*60*60*24*30},
   store:new MongoStroe({
     url:'mongodb://localhost/blog'
-  })
+  }),
+    resave:false,
+    saveUninitialized:true
 
 }));
 

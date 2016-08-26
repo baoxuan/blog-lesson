@@ -106,4 +106,8 @@ session保存在sessionStore的数据仓库中。默认使用MemoryStore。也�
 
 flash 是一个在session中用于存储信息的特定区域。信息写入flash,下一次显示完毕即被清除。配合重定向使用
 
+**启动mongodb**
 
+打开 mongodb/bin
+
+ `./mongod --dbpath ../blog/`
