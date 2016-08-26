@@ -1,6 +1,23 @@
-var mongodb = require('./db'),
+var Db = require('./db'),
 	markdown = require('markdown').markdown,
-	async =  require('async');
+	async =  require('async'),
+	poolModule = require('generic-pool');
+var pool = poolModule.Pool({
+	name   :'mongoPool',
+	create : function (callback) {
+		var mongodb = Db();
+		mongodb.open(function (err, db) {
+			callback(err, db);
+		})
+	},
+	destroy : function (mongodb) {
+		mongodb.close();
+	},
+	max     :100,
+	min     :5,
+	idleTimeoutMillis : 30000,
+	log     :true
+});
 
 
 function Post(name, head, title, tags, post){
@@ -37,8 +54,8 @@ Post.prototype.save = function(callback){
 	async.waterfall([
 		//打开数据库
 		function (cb) {
-			mongodb.open(function (err, db) {
-				cb(err, db);
+			pool.acquire(function (err, mongodb) {
+				cb(err, mongodb);
 			});
 		},
 		function (db, cb) {
@@ -55,7 +72,7 @@ Post.prototype.save = function(callback){
 				cb(err)
 			});
 		}],function (err) {
-			mongodb.close();
+			pool.release(mongodb);
 			callback(err);
 	});
 };
@@ -64,8 +81,8 @@ Post.getTen =  function(name, page, callback){
 	//打开数据库
 	async.waterfall([
 		function (cb) {
-			mongodb.open(function (err,db) {
-				cb(err, db);
+			pool.acquire(function (err,mongodb) {
+				cb(err, mongodb);
 			})
 		},
 		function (db, cb) {
@@ -94,7 +111,7 @@ Post.getTen =  function(name, page, callback){
 			})
 		}
 	],function (err, docs, total) {
-		mongodb.close();
+		pool.release(mongodb);
 		callback(err, docs, total);
 	})
 };
@@ -429,6 +446,6 @@ Post.reprint = function(reprint_from, reprint_to, callback) {
 	],function (err,post) {
 		mongodb.close();
 		callback(err,post.ops[0]);
-	})     
+	})
 };
 
