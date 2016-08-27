@@ -2,7 +2,7 @@ var setting = require('../setting'),
 	Db = require('mongodb').Db,
 	Connection = require('mongodb').Connection,
 	Server = require('mongodb').Server;
-// module.exports = new Db(setting.db,new Server(setting.host,setting.port),{safe:true});
-module.exports = function () {
-	return new Db(setting.db, new Server(setting.host, setting.port),{safe:true,poolSize:1});
-}
+module.exports = new Db(setting.db,new Server(setting.host,setting.port),{safe:true});
+// module.exports = function () {
+// 	return new Db(setting.db, new Server(setting.host, setting.port),{safe:true,poolSize:1});
+// }

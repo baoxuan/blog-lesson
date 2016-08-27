@@ -1,23 +1,23 @@
-var Db = require('./db'),
+var mongodb = require('./db'),
 	markdown = require('markdown').markdown,
 	async =  require('async'),
 	poolModule = require('generic-pool');
-var pool = poolModule.Pool({
-	name   :'mongoPool',
-	create : function (callback) {
-		var mongodb = Db();
-		mongodb.open(function (err, db) {
-			callback(err, db);
-		})
-	},
-	destroy : function (mongodb) {
-		mongodb.close();
-	},
-	max     :100,
-	min     :5,
-	idleTimeoutMillis : 30000,
-	log     :true
-});
+// var pool = poolModule.Pool({
+// 	name   :'mongoPool',
+// 	create : function (callback) {
+// 		var mongodb = Db();
+// 		mongodb.open(function (err, db) {
+// 			callback(err, db);
+// 		})
+// 	},
+// 	destroy : function (mongodb) {
+// 		mongodb.close();
+// 	},
+// 	max     :100,
+// 	min     :5,
+// 	idleTimeoutMillis : 30000,
+// 	log     :true
+// });
 
 
 function Post(name, head, title, tags, post){
@@ -54,7 +54,7 @@ Post.prototype.save = function(callback){
 	async.waterfall([
 		//打开数据库
 		function (cb) {
-			pool.acquire(function (err, mongodb) {
+			mongodb.open(function (err, mongodb) {
 				cb(err, mongodb);
 			});
 		},
@@ -72,7 +72,8 @@ Post.prototype.save = function(callback){
 				cb(err)
 			});
 		}],function (err) {
-			pool.release(mongodb);
+			// pool.release(mongodb);
+			mongodb.close();
 			callback(err);
 	});
 };
@@ -81,7 +82,7 @@ Post.getTen =  function(name, page, callback){
 	//打开数据库
 	async.waterfall([
 		function (cb) {
-			pool.acquire(function (err,mongodb) {
+			mongodb.open(function (err,mongodb) {
 				cb(err, mongodb);
 			})
 		},
@@ -111,7 +112,7 @@ Post.getTen =  function(name, page, callback){
 			})
 		}
 	],function (err, docs, total) {
-		pool.release(mongodb);
+		mongodb.close();
 		callback(err, docs, total);
 	})
 };
