@@ -1,5 +1,5 @@
 var mongodb = require('./db'),
-	markdown = require('markdown').markdown,
+	// markdown = require('markdown').markdown,
 	async =  require('async'),
 	poolModule = require('generic-pool');
 // var pool = poolModule.Pool({
@@ -104,9 +104,9 @@ Post.getTen =  function(name, page, callback){
 				}).sort({
 					time: -1
 				}).toArray(function (err, docs) {
-					docs.forEach(function (doc) {
-						doc.post = markdown.toHTML(doc.post);
-					})
+					// docs.forEach(function (doc) {
+					// 	doc.post = markdown.toHTML(doc.post);
+					// })
 					cb(err, docs, total);
 				});
 			})
@@ -145,10 +145,10 @@ Post.getOne = function(name, day, title, callback){
 					},{
 						$inc:{"pv":1}
 					});
-					doc.post = markdown.toHTML(doc.post);
+	/*				doc.post = markdown.toHTML(doc.post);
 					doc.comments.forEach(function (comment) {
 						comment.content = markdown.toHTML(comment.content);
-					});
+					});*/
 				}
 				cb(err,doc);
 			})
